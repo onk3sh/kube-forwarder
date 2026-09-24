@@ -1,6 +1,6 @@
 import { resolve } from 'node:path'
 import { defineConfig, externalizeDepsPlugin } from 'electron-vite'
-import vue from '@vitejs/plugin-vue2'
+import vue from '@vitejs/plugin-vue'
 
 const root = import.meta.dirname
 const mode = process.env.NODE_ENV || 'production'
@@ -28,8 +28,7 @@ export default defineConfig({
       // The codebase imports .vue components without the extension (as webpack did).
       extensions: ['.mjs', '.js', '.json', '.vue'],
       alias: {
-        '@': resolve(root, 'src/renderer'),
-        vue$: 'vue/dist/vue.esm.js'
+        '@': resolve(root, 'src/renderer')
       }
     },
     // The renderer no longer runs Node, but a few files still read build-time

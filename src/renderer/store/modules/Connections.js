@@ -1,5 +1,3 @@
-import Vue from 'vue'
-
 import { createToolset } from '../helpers/validations'
 import * as connectionStates from '../../lib/constants/connection-states'
 
@@ -33,7 +31,7 @@ const mutations = {
     const item = { flags: { http: false }, ...payloadedItem }
 
     const valid = validate(item)
-    if (valid) Vue.set(state, [item.address, item.port].join(':'), item)
+    if (valid) state[[item.address, item.port].join(':')] = item
     else throw new Error(JSON.stringify(validate.errors))
   },
 
@@ -42,13 +40,13 @@ const mutations = {
     if (!flagName) throw new Error('flagName must be present')
     const key = [address, port].join(':')
     if (state[key]) {
-      Vue.set(state[key].flags, flagName, flagValue)
+      state[key].flags[flagName] = flagValue
     }
   },
 
   DELETE(state, { address, port }) {
     if (!port) throw new Error('port must present')
-    Vue.delete(state, [address, port].join(':'))
+    delete state[[address, port].join(':')]
   }
 }
 

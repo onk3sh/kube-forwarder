@@ -1,5 +1,4 @@
-import Vue from 'vue'
-import Vuex from 'vuex'
+import { createStore } from 'vuex'
 import deepmerge from 'deepmerge'
 
 import modules from './modules'
@@ -9,12 +8,10 @@ import isVersion1 from './helpers/is-version-1'
 
 export const CURRENT_STATE_VERSION = 2
 
-Vue.use(Vuex)
-
 const persistedModuleNames = Object.keys(modules).filter(name => modules[name].persisted !== false)
 const persistedKeys = ['version', ...persistedModuleNames]
 
-const store = new Vuex.Store({
+const store = createStore({
   state: {
     version: CURRENT_STATE_VERSION
   },
