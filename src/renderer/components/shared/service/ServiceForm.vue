@@ -72,10 +72,8 @@ import cloneDeep from 'clone-deep'
 import { mapActions } from 'vuex'
 import { required, minLength, integer, between } from 'vuelidate/lib/validators'
 import { validationMixin } from 'vuelidate'
-import { CoreV1Api, ExtensionsV1beta1Api } from '@kubernetes/client-node' // eslint-disable-line camelcase
 
 import * as resourceKinds from '../../../lib/constants/workload-types'
-import * as clusterHelper from '../../../lib/helpers/cluster'
 
 import BaseCheckbox from '../form/BaseCheckbox'
 import BaseForm from '../form/BaseForm'
@@ -163,14 +161,6 @@ export default {
     cluster() {
       return this.$store.state.Clusters.items[this.attributes.clusterId]
     },
-    coreApi() {
-      try {
-        return clusterHelper.buildApiClient(this.cluster, CoreV1Api)
-      } catch (e) {
-        console.error(e)
-        return null
-      }
-    },
     resourcesCacheKey() {
       const { clusterId, namespace, workloadType } = this.attributes
       return `${clusterId}:${namespace}:${workloadType}`
@@ -190,12 +180,11 @@ export default {
       }
     },
     async handleNamespaceFocus() {
-      if (this.coreApi && this.namespaces.clusterId !== this.attributes.clusterId) {
+      if (this.cluster && this.namespaces.clusterId !== this.attributes.clusterId) {
         this.namespaces.loading = true
 
         try {
-          const namespaces = (await this.coreApi.listNamespace()).body.items
-          this.namespaces.data = namespaces.map(x => x.metadata.name)
+          this.namespaces.data = await window.api.resources.namespaces(this.cluster.config)
           this.namespaces.clusterId = this.cluster.id
         } catch (e) {
           console.error(e)
@@ -205,12 +194,12 @@ export default {
       }
     },
     async handleResourceNameFocus() {
-      if (this.coreApi && this.resources.cacheKey !== this.resourcesCacheKey) {
+      if (this.cluster && this.resources.cacheKey !== this.resourcesCacheKey) {
         this.resources.loading = true
 
         try {
-          this.resources.data = await this.getResources(
-            this.coreApi,
+          this.resources.data = await window.api.resources.list(
+            this.cluster.config,
             this.attributes.workloadType,
             this.attributes.namespace
           )
@@ -221,21 +210,6 @@ export default {
 
         this.resources.loading = false
       }
-    },
-    async getResources(coreApi, kind, namespace) {
-      if (kind === resourceKinds.POD) {
-        const response = await coreApi.listNamespacedPod(namespace)
-        return response.body.items.map(x => x.metadata.name)
-      } else if (kind === resourceKinds.DEPLOYMENT) {
-        const extensionsApi = clusterHelper.buildApiClient(this.cluster, ExtensionsV1beta1Api)
-        const response = await extensionsApi.listNamespacedDeployment(namespace)
-        return response.body.items.map(x => x.metadata.name)
-      } else if (kind === resourceKinds.SERVICE) {
-        const response = await coreApi.listNamespacedService(namespace)
-        return response.body.items.map(x => x.metadata.name)
-      }
-
-      return []
     },
     handleSubmit() {
       const action = this.serviceId ? 'Services/updateService' : 'Services/createService'
