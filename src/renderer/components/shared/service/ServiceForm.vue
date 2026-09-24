@@ -69,7 +69,7 @@
 import cloneDeep from 'clone-deep'
 import { mapActions } from 'vuex'
 
-import { required, minLength, integer, between, field } from '../../../lib/validators'
+import { required, integer, between, field } from '../../../lib/validators'
 import * as resourceKinds from '../../../lib/constants/workload-types'
 
 import BaseCheckbox from '../form/BaseCheckbox'
@@ -133,15 +133,8 @@ export default {
         localPort: field(forward.localPort, { required, integer, between: between(0, 65535) }, t),
         remotePort: field(forward.remotePort, { required, integer, between: between(0, 65535) }, t)
       }))
-      const forwardsInvalid =
-        !required(a.forwards) ||
-        !minLength(1)(a.forwards) ||
-        rows.some(row => row.localPort.$invalid || row.remotePort.$invalid)
       const forwards = {
-        $invalid: forwardsInvalid,
-        $error: t && forwardsInvalid,
-        required: required(a.forwards),
-        minLength: minLength(1)(a.forwards),
+        $invalid: !required(a.forwards) || rows.some(row => row.localPort.$invalid || row.remotePort.$invalid),
         rows
       }
 
@@ -151,7 +144,6 @@ export default {
         workloadType: field(a.workloadType, { required, oneOf }, t),
         workloadName: field(a.workloadName, { required }, t),
         alias: field(a.alias, {}, t),
-        localAddress: field(a.localAddress, {}, t),
         forwards
       }
 
