@@ -1,11 +1,15 @@
 <template>
-  <component
-    :is="tag"
-    :class="className"
-    v-bind="{ ...$attrs, ...computedProps }"
-  >
+  <!-- Explicit elements, not <component :is="tag">: in Vue 3 :is="'button'"
+       resolves to this very component (self-reference) and recurses forever. -->
+  <router-link v-if="to" :to="to" :class="className" v-bind="$attrs">
     <slot />
-  </component>
+  </router-link>
+  <a v-else-if="href" :href="href" :disabled="disabled" :class="className" v-bind="$attrs">
+    <slot />
+  </a>
+  <button v-else :type="type" :disabled="disabled" :class="className" v-bind="$attrs">
+    <slot />
+  </button>
 </template>
 
 <script>
@@ -29,11 +33,6 @@ export default {
     }
   },
   computed: {
-    tag() {
-      if (this.to) return 'router-link'
-      if (this.href) return 'a'
-      return 'button'
-    },
     className() {
       return {
         button: true,
@@ -44,13 +43,6 @@ export default {
         [`button_theme_${this.theme}`]: true,
         [`button_size_${this.size}`]: true
       }
-    },
-    computedProps() {
-      const { href, disabled, to, tag, type } = this
-
-      if (tag === 'router-link') return { to }
-      if (tag === 'a') return { href, disabled }
-      return { disabled, type }
     }
   }
 }

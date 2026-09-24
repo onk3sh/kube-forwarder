@@ -46,7 +46,9 @@ store.subscribe((_mutation, state) => {
   const filtered = {}
   for (const key of persistedKeys) filtered[key] = state[key]
   try {
-    window.api.store.set(filtered)
+    // JSON round-trip strips Vue's reactive Proxy to a plain object; a Proxy
+    // isn't structured-cloneable and IPC would throw "could not be cloned".
+    window.api.store.set(JSON.parse(JSON.stringify(filtered)))
   } catch (e) {
     console.error('Failed to persist state', e)
   }
