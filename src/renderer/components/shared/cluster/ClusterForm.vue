@@ -64,9 +64,7 @@ import cloneDeep from 'clone-deep'
 import { mapActions } from 'vuex'
 import { required } from 'vuelidate/lib/validators'
 import { validationMixin } from 'vuelidate'
-import { promises as fs } from 'fs'
 import deepmerge from 'deepmerge'
-import { KubeConfig } from '@kubernetes/client-node'
 
 import BaseForm from '../form/BaseForm'
 import BaseInput from '../form/BaseInput'
@@ -74,7 +72,7 @@ import AutocompleteInput from '../form/AutocompleteInput'
 import BaseTextArea from '../form/BaseTextArea'
 import Button from '../Button'
 import ControlGroup from '../form/ControlGroup'
-import { checkConnection, buildKubeConfig } from '../../../lib/helpers/cluster'
+import { checkConnection, contextsFromString } from '../../../lib/helpers/cluster'
 import { showMessageBox, showOpenDialog, showConfirmBox, showErrorBox } from '../../../lib/helpers/ui'
 import BaseRadioButtons from '../form/BaseRadioButtons'
 import * as configStoringMethods from '../../../lib/constants/config-storing-methods'
@@ -184,20 +182,12 @@ export default {
     async handleCheckConnection() {
       if (this.checkingConnection) return
 
-      let kubeConfig
-      try {
-        kubeConfig = buildKubeConfig(this.attributes.config)
-      } catch (error) {
-        showMessageBox('Config is invalid', { details: error.message })
-        return
-      }
-
       this.checkingConnection = true
 
-      const error = await checkConnection(kubeConfig)
+      const error = await checkConnection(this.attributes.config)
       if (error) {
         await showMessageBox('Connection failed', {
-          details: `${error.message}${error.originError.message ? `\n${error.originError.message}` : ''}`
+          details: `${error.message}${error.originMessage ? `\n${error.originMessage}` : ''}`
         })
       } else {
         await showMessageBox('Connection successful')
@@ -209,33 +199,31 @@ export default {
       const filePaths = await showOpenDialog({ properties: ['openFile'] })
       if (!filePaths) return
 
-      const fileStats = await fs.stat(filePaths[0])
-      if (fileStats.size > size.MBYTE) return showErrorBox('Sorry, the file is too large (> 1MB)')
+      const file = await window.api.readFile(filePaths[0])
+      if (file.error) return showErrorBox(file.error)
+      if (file.size > size.MBYTE) return showErrorBox('Sorry, the file is too large (> 1MB)')
 
-      const content = await fs.readFile(filePaths[0], { encoding: 'utf8' })
+      const content = file.content
 
       if (method === configStoringMethods.CONTENT) {
         this.attributes.config.content = content
       }
 
       if (method === configStoringMethods.PATH) {
-        let kubeConfig = new KubeConfig()
-        try {
-          kubeConfig.loadFromString(content)
-        } catch (error) {
-          kubeConfig = null
-          const result = await showConfirmBox(
-            `The files contains invalid config. \nError ${error.message}.\n\n Do you want to continue?`
-          )
-          if (!result) return
-        }
+        const result = await contextsFromString(content)
 
-        this.attributes.config.path = filePaths[0]
-        if (kubeConfig) {
-          this.attributes.config.currentContext = kubeConfig.getCurrentContext()
-          this.contexts = kubeConfig.contexts
-        } else {
+        if (result.error) {
+          const proceed = await showConfirmBox(
+            `The files contains invalid config. \nError ${result.error}.\n\n Do you want to continue?`
+          )
+          if (!proceed) return
+
+          this.attributes.config.path = filePaths[0]
           this.contexts = []
+        } else {
+          this.attributes.config.path = filePaths[0]
+          this.attributes.config.currentContext = result.currentContext
+          this.contexts = result.contexts
         }
       }
     }
