@@ -2,8 +2,7 @@
   <component
     :is="tag"
     :class="className"
-    v-bind="computedProps"
-    v-on="$listeners"
+    v-bind="{ ...$attrs, ...computedProps }"
   >
     <slot />
   </component>
@@ -12,6 +11,7 @@
 <script>
 export default {
   name: 'Button',
+  inheritAttrs: false,
   props: {
     to: { type: String, default: null },
     href: { type: String, default: null },

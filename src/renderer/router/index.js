@@ -1,5 +1,4 @@
-import Vue from 'vue'
-import Router from 'vue-router'
+import { createRouter, createWebHashHistory } from 'vue-router'
 
 import store from '../store'
 import analytics from '../analytics'
@@ -14,9 +13,8 @@ import ServiceNew from '@/components/ServiceNew'
 import ServiceEdit from '@/components/ServiceEdit'
 import ServiceClone from '@/components/ServiceClone'
 
-Vue.use(Router)
-
-const router = new Router({
+const router = createRouter({
+  history: createWebHashHistory(),
   routes: [
     {
       path: '/',
@@ -33,12 +31,12 @@ const router = new Router({
       ]
     },
     {
-      path: '*',
+      path: '/:pathMatch(.*)*',
       redirect: '/'
     }
   ],
   scrollBehavior() {
-    return { x: 0, y: 0 }
+    return { left: 0, top: 0 }
   }
 })
 
