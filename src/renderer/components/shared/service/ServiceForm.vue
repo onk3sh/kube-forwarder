@@ -70,6 +70,7 @@ import cloneDeep from 'clone-deep'
 import { mapActions } from 'vuex'
 
 import { required, integer, between, field } from '../../../lib/validators'
+import { plain } from '../../../lib/plain'
 import * as resourceKinds from '../../../lib/constants/workload-types'
 
 import BaseCheckbox from '../form/BaseCheckbox'
@@ -191,7 +192,7 @@ export default {
         this.namespaces.loading = true
 
         try {
-          this.namespaces.data = await window.api.resources.namespaces(this.cluster.config)
+          this.namespaces.data = await window.api.resources.namespaces(plain(this.cluster.config))
           this.namespaces.clusterId = this.cluster.id
         } catch (e) {
           console.error(e)
@@ -206,7 +207,7 @@ export default {
 
         try {
           this.resources.data = await window.api.resources.list(
-            this.cluster.config,
+            plain(this.cluster.config),
             this.attributes.workloadType,
             this.attributes.namespace
           )

@@ -1,4 +1,5 @@
 import { createToolset } from '../helpers/validations'
+import { plain } from '../../lib/plain'
 import * as connectionStates from '../../lib/constants/connection-states'
 
 // The forwarding engine (k8s client + local TCP servers) lives in the MAIN
@@ -53,11 +54,11 @@ const mutations = {
 const actions = {
   createConnection({ rootState }, service) {
     const cluster = rootState.Clusters.items[service.clusterId]
-    return window.api.connections.create({ service, cluster })
+    return window.api.connections.create(plain({ service, cluster }))
   },
 
   deleteConnection(_context, service) {
-    return window.api.connections.delete(service)
+    return window.api.connections.delete(plain(service))
   }
 }
 
