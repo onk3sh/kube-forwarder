@@ -1,5 +1,5 @@
 // Minimal form validation, replacing vuelidate (which the forms used only for
-// required/integer/between/minLength). Each validator returns true when the
+// required/integer/between). Each validator returns true when the
 // value is VALID — matching the boolean shape ValidationErrors.vue reads
 // (attribute.required/integer/between === false means "failed").
 
@@ -19,8 +19,6 @@ export const between = (min, max) => value => {
   const number = Number(value)
   return number >= min && number <= max
 }
-
-export const minLength = min => value => (value ? value.length >= min : false)
 
 // Builds a per-field validation object: { $error, $invalid, <ruleName>: bool }.
 // `$error` is only true once the field (or form) has been touched, so errors
