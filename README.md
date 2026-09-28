@@ -24,6 +24,20 @@
 
 ![Clusters Page](https://user-images.githubusercontent.com/2697570/60103100-524d5d80-975f-11e9-84ab-bcc962be0bb7.png)
 
+## Fork release notes
+
+This is a maintained fork of [pixel-point/kube-forwarder](https://github.com/pixel-point/kube-forwarder) with native Apple Silicon support. Downloads and releases: [onk3sh/kube-forwarder](https://github.com/onk3sh/kube-forwarder/releases).
+
+### 2.0.0
+
+- **Native arm64 (Apple Silicon)** build — runs without Rosetta.
+- **Vue 2.7 → Vue 3** migration.
+- **Build system** replaced electron-vue/webpack with electron-vite (Electron 44).
+- Fixed Vue 3 runtime regressions found in the packaged app.
+- Fixed `object could not be cloned` on Kubernetes calls across the contextBridge/IPC boundary.
+- Removed the dead build system and dead validation code.
+- Replaced the dead Karma/Spectron test scaffolding with Vitest (`npm test`).
+
 ## Features
 
 **Auto-reconnect**
