@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://nodejs.org/en/">
-    <img src="https://img.shields.io/badge/Node-v10.16.0-brightgreen.svg" alt="node version">
+    <img src="https://img.shields.io/badge/Node-v18.0.0-brightgreen.svg" alt="node version">
   </a>
   <a href="https://electronjs.org/">
     <img src="https://img.shields.io/badge/Electron-v44.0.0-brightgreen.svg" alt="electron version">
@@ -166,7 +166,7 @@ This project was generated with [electron-vue](https://github.com/SimulatedGREG/
 
 ### Prerequisites
 
-* Node 10.8+
+* Node 18+
 * MacOS (if you want to build `.dmg` target)
 * Docker (if you want to run tests)
 * ImageMagick (to build app icon)
