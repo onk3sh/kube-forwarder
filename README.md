@@ -3,10 +3,10 @@
     <img src="https://img.shields.io/badge/Node-v10.16.0-brightgreen.svg" alt="node version">
   </a>
   <a href="https://electronjs.org/">
-    <img src="https://img.shields.io/badge/Electron-v5.0.6-brightgreen.svg" alt="electron version">
+    <img src="https://img.shields.io/badge/Electron-v44.0.0-brightgreen.svg" alt="electron version">
   </a>
   <a href="https://electronjs.org/">
-    <img src="https://img.shields.io/badge/Vue-v2.6.10-brightgreen.svg" alt="vue version">
+    <img src="https://img.shields.io/badge/Vue-v3.5.13-brightgreen.svg" alt="vue version">
   </a>
 </p>
 
